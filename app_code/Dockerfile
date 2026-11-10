@@ -1,5 +1,5 @@
 # Используем официальный легкий образ Python
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 # Устанавливаем системные утилиты для сборки (нужно для некоторых ИТ-библиотек)
 RUN apt-get update && apt-get install -y --no-install-recommends \

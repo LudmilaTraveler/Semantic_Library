@@ -6,7 +6,7 @@ networks:
 
 services:
   vector_db:
-    image: qdrant/qdrant:latest
+    image: qdrant/qdrant:v1.11.0
     container_name: library_qdrant_db
     networks:
       - library_net
@@ -14,6 +14,12 @@ services:
       - "6333:6333"
     volumes:
       - ./qdrant_data:/qdrant/storage:z
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     restart: always
 
   search_engine:
@@ -28,10 +34,11 @@ services:
       - QDRANT_HOST=vector_db
       - QDRANT_PORT=6333
       - TRANSFORMERS_OFFLINE=1
-      #- HF_ENDPOINT=https://hf-mirror.com # 🌟 НОВАЯ СТРОКА: переключаем скачивание на зеркало
+      #- HF_ENDPOINT=https://hf-mirror.com # переключаем скачивание на зеркало
       - HF_HUB_DISABLE_SYMLINKS_WARNING=1
     volumes:
       - ./sbert_model_cache:/app/model_cache
     depends_on:
-      - vector_db
+      vector_db:
+        condition: service_healthy
     restart: always

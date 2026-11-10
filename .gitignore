@@ -10,3 +10,5 @@ sbert_model_cache/
 __pycache__/
 *.pyc
 .pytest_cache/
+# Заметки
+Automated.docx

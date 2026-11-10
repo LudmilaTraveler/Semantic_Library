@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
+from qdrant_client.models import Distance, VectorParams, PointStruct    
 from sentence_transformers import SentenceTransformer
 app = FastAPI(title="Семантическая Библиотека ВУЗа")
 
@@ -44,12 +44,12 @@ ARTICLES_DB = {
     5: {"title": "Глубокое обучение в лингвистике", "abstract": "Использование языковых моделей для автоматического анализа тональности отзывов студентов о качестве учебного процесса."}
 }
 
-# ИЗМЕНЕНИЕ: Теперь главная страница возвращает красивый HTML-интерфейс!
+# Теперь главная страница возвращает красивый HTML-интерфейс
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
 
-# Эндпоинт генерации векторов (теперь вызывается автоматически интерфейсом)
+# Эндпоинт генерации векторов 
 @app.post("/init-database")
 def init_database():
     # Импортируем нужные типы для квантования прямо тут, чтобы не лезть наверх файла
@@ -57,8 +57,8 @@ def init_database():
 
     qdrant_client.recreate_collection(
         collection_name=COLLECTION_NAME,
-        vectors_config=VectorParams(size=768, distance=Distance.COSINE), # ваш размер 768
-        # ДОБАВЛЯЕМ СЮДА: сжатие векторов в 4 раза прямо при пересоздании коллекции
+        vectors_config=VectorParams(size=768, distance=Distance.COSINE), # размер 768
+        # сжатие векторов в 4 раза прямо при пересоздании коллекции
         quantization_config=QuantizationConfig(
             scalar=ScalarQuantization(
                 type=ScalarType.INT8,
@@ -76,7 +76,7 @@ def init_database():
     qdrant_client.upsert(collection_name=COLLECTION_NAME, points=points)
     return {"status": "success", "inserted_articles": len(points)}
 
-# Эндпоинт самого семантического поиска
+# Эндпоинт семантического поиска
 @app.get("/search")
 def search_articles(query: str = Query(..., description="Поисковый запрос")):
     query_vector = model.encode(query).tolist()
@@ -111,9 +111,9 @@ async def ask_ai(query: str, context: str):
 
 ОТВЕТ:"""
 
-    # Данные для отправки в вашу локальную Qwen2.5:1.5b
+    # Данные для отправки в локальную Qwen2.5:1.5b
     payload = {
-        "model": "qwen2.5:1.5b",  # Имя вашей модели в Ollama
+        "model": "qwen2.5:1.5b",  # Имя модели в Ollama
         "prompt": prompt,
         "stream": False,  # Получить весь ответ сразу, а не по буквам
         "options": {
